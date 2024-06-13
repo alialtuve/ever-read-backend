@@ -13,12 +13,16 @@ const authorSchema = mongoose.Schema(
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [true, 'Provide user'],
+      required: [false, 'Provide user'], // change to true
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
+    },
+    active: {
+      type: Boolean,
+      default: true,
     }
   }, {timestamps:true}
 );

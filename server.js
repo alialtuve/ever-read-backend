@@ -1,19 +1,22 @@
 require('dotenv').config();
-
-//extra security packages
 const helmet = require('helmet');
 const cors = require('cors');
-
 const express = require('express');
 const app = express();
 
-//Data base connection
+//Db connection
 const connectDB = require('./config/connection');
 
+//Routers
+
+// Error handlers
+
+// Security and others
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 
+// 
 const port = process.env.PORT || 8000;
 
 const start = async() => {

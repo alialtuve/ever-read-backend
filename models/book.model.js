@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const bookSchema = new mongoose.Schema(
   {
-    name : {
+    title : {
       type: String,
       required: [true, 'Please provide book title'],
       maxlength: 150,
@@ -31,7 +31,7 @@ const bookSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [true, 'Provide user'],
+      required: [false, 'Provide user'], // change to true
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
