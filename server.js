@@ -10,6 +10,9 @@ const connectDB = require('./config/connection');
 //Routers
 const authRouter = require('./routes/auth.route');
 const genreRouter = require('./routes/genre.route');
+const authorRouter = require('./routes/author.route');
+const bookRouter = require('./routes/book.route');
+
 // Error handlers
 
 // Security and others
@@ -20,6 +23,8 @@ app.use(cors());
 // routes
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/genre', genreRouter);
+app.use('/api/v1/author', authorRouter);
+app.use('/api/v1/book', bookRouter);
 
 // Server  
 const port = process.env.PORT || 8000;

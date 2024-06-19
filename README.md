@@ -3,6 +3,7 @@
 #### App for manage books availability
 
 **Repo Name**: ever-read-backend
+**Node Version**: v18.16.0
 
 ## How to start?
 

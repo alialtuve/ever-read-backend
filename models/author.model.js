@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
+const mongoose_delete = require('mongoose-delete');
 
 const authorSchema = mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
+      maxlength: 150
     },
     country: {
       type: String,
@@ -19,12 +21,10 @@ const authorSchema = mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
-    },
-    active: {
-      type: Boolean,
-      default: true,
     }
   }, {timestamps:true}
 );
+
+authorSchema.plugin(mongoose_delete, { deletedAt: true, overrideMethods: true});
 
 module.exports = mongoose.model('Author', authorSchema);
