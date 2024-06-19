@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const mongoose_delete = require('mongoose-delete');
 
 const genreSchema = mongoose.Schema(
   {
@@ -16,12 +17,10 @@ const genreSchema = mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
-    },
-    active: {
-      type: Boolean,
-      default: true
     }
   }, {timestamps:true}
 );
+
+genreSchema.plugin(mongoose_delete, { deletedAt : true, overrideMethods: true });
 
 module.exports = mongoose.model('Genre', genreSchema);
