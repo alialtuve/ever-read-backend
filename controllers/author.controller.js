@@ -25,7 +25,7 @@ const updateAuthor = async(req, res) => {
   const author = await Author.findByIdAndUpdate(
     { _id:authorId },
     req.body,
-    { new:true }
+    { new:true, runValidators: true }
   );
   res.status(200).json({ author });
 }

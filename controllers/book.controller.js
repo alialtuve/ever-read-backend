@@ -25,7 +25,7 @@ const updateBook = async(req, res) => {
   const book = await Book.findByIdAndUpdate(
     { _id:bookId },
     req.body,
-    { new:true }
+    { new:true, runValidators: true }
   );
   res.status(200).json({ book });
 }
