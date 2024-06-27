@@ -11,7 +11,7 @@ const lendSchema = new mongoose.Schema({
       ref: 'User',
       required: true
     },
-    status: { // returned true - no returned : false
+    returned: { // returned true - no returned : false
       type: Boolean,
       default: false
     },
