@@ -116,12 +116,21 @@ const updateLend = async(req, res) => {
 }
 
 const  getBooksByUser = async(req,res) => {
+  let result;
+  const {returned} = req.query;
 
   const {
     params: {id:userId}
   } = req;
 
-   const lend = await Lend.find({user:userId})
+  /* This is for find returned, no returned or both books by user */
+  if(returned){
+    result = Lend.find({user:userId, returned});
+  } else {
+    result = Lend.find({user:userId});
+  }
+
+  const lend = await result
             .populate({ 
               path: 'book', 
               model: Book,
@@ -138,7 +147,7 @@ const  getBooksByUser = async(req,res) => {
               select: { 'name':1, 'email':1 }
             });
 
-    res.status(200).json({ lend })
+  res.status(200).json({ lend })
 }
 
 module.exports = {

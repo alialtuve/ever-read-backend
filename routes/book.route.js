@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { createBook, getAllBooks, 
         getBook, updateBook, 
-        softDelteBook } = require('../controllers/book.controller');
+        softDeleteBook } = require('../controllers/book.controller');
 
 router.route('/')
 .post(createBook)
@@ -12,6 +12,6 @@ router.route('/')
 router.route('/:id')
 .get(getBook)
 .patch(updateBook)
-.delete(softDelteBook);
+.delete(softDeleteBook);
 
 module.exports = router;
