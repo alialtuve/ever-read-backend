@@ -16,7 +16,7 @@ const bookSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'Please provide the total amount of this book']
     },
-    available: { /** Change name field by borrowed  in availability file too*/
+    borrowed: { 
       type: Number,
     },
     author: {

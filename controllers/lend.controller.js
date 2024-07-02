@@ -19,7 +19,7 @@ const createLend = async(req, res) => {
   }
 
   if(availability == -1) {
-    throw new Error('No book available!');/** This must change after implementing handle errors middleware**/
+    throw new Error('This book is not available!');/** This must change after implementing handle errors middleware**/
   }
 
   const lend = await Lend.create(req.body);
@@ -29,7 +29,7 @@ const createLend = async(req, res) => {
     const returnBook = await Book.updateOne(
       {_id: book}, 
       {
-        $inc: { available: 1}
+        $inc: { borrowed: 1}
       }
     );
   }
@@ -104,12 +104,12 @@ const updateLend = async(req, res) => {
     availability = await checkAvalability(lend.book);
     
     if(availability == 0) {
-      throw new Error('No loan updated!');/** This must change after implementing handle errors middleware**/
+      throw new Error('No loan updated!');/* This must change after implementing handle errors middleware**/
     }
 
     const returnBook = await Book.updateOne(
       { _id: lend.book}, 
-      { $inc: { available: -1} }
+      { $inc: { borrowed: -1} }
       );
   }
   res.status(200).json({ lend });

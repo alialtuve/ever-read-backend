@@ -5,11 +5,11 @@ const checkAvalability = async(bookId) => {
 
     const res = await Book.findById(bookId);
 
-    if(res.available === res.stock){
+    if(res.borrowed === res.stock){
       return -1;
     }
 
-    if(res.available === res.stock){
+    if(res.borrowed === res.stock){
       return 0;
     }
 
