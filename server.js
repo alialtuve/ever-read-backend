@@ -13,6 +13,7 @@ const genreRouter = require('./routes/genre.route');
 const authorRouter = require('./routes/author.route');
 const bookRouter = require('./routes/book.route');
 const lendRouter = require('./routes/lend.route');
+const userRouter = require('./routes/user.route');
 
 // Error handlers
 
@@ -27,6 +28,7 @@ app.use('/api/v1/genre', genreRouter);
 app.use('/api/v1/author', authorRouter);
 app.use('/api/v1/book', bookRouter);
 app.use('/api/v1/lend', lendRouter);
+app.use('/api/v1/user', userRouter);
 
 // Server  
 const port = process.env.PORT || 8000;

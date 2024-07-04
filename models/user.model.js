@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const mongoose_delete = require('mongoose-delete');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const userSchema = mongoose.Schema(
   {
@@ -32,6 +34,24 @@ const userSchema = mongoose.Schema(
     }
   }, {timestamps:true}
 );
+
+userSchema.pre('save', async function() {
+  const saltCode =  await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, saltCode);
+});
+
+userSchema.methods.comparePassword = async function(typedPassword){
+  const isMatch = await bcrypt.compare(typedPassword, this.password);
+  return isMatch;
+}
+
+userSchema.methods.generateJWT = async function() {
+  const token = await jwt.sign({user:this.id, name:this.name, role:this.role}, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_LIFETIME
+  });
+
+  return token;
+}
 
 userSchema.plugin(mongoose_delete, { deletedAt : true, overrideMethods: true });
 
