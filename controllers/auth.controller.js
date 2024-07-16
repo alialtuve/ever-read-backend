@@ -27,11 +27,9 @@ const login = async(req, res) => {
   }
 
   const token = await user.generateJWT();
-  console.log('token',token);
+
   res.status(200).json({user: {name:user.name}, token});
 }
-
-
 
 module.exports = {
   register,

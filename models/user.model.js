@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const mongoose_delete = require('mongoose-delete');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const {JWT_LIFETIME, JWT_SECRET} = require('../config/env');
 
 const userSchema = mongoose.Schema(
   {
@@ -46,8 +47,8 @@ userSchema.methods.comparePassword = async function(typedPassword){
 }
 
 userSchema.methods.generateJWT = async function() {
-  const token = await jwt.sign({user:this.id, name:this.name, role:this.role}, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_LIFETIME
+  const token = await jwt.sign({user:this.id, name:this.name, role:this.role}, JWT_SECRET, {
+    expiresIn: JWT_LIFETIME
   });
 
   return token;
