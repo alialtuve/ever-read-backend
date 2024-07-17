@@ -28,12 +28,12 @@ const userSchema = mongoose.Schema(
       minlength: 6,
       maxlength: 25,
     },
-    role: {
-      type: String,
-      enum: ['admin', 'librarian', 'reader', 'visitor'],
-      default: 'visitor',
+    rol: {
+      type: mongoose.Types.ObjectId,
+      ref: 'Rol',
+      required: false
     }
-  }, {timestamps:true}
+  }, {timestamps:true, versionKey: false}
 );
 
 userSchema.pre('save', async function() {
@@ -47,7 +47,7 @@ userSchema.methods.comparePassword = async function(typedPassword){
 }
 
 userSchema.methods.generateJWT = async function() {
-  const token = await jwt.sign({user:this.id, name:this.name, role:this.role}, JWT_SECRET, {
+  const token = await jwt.sign({user:this.id, name:this.name, rol:this.rol}, JWT_SECRET, {
     expiresIn: JWT_LIFETIME
   });
 

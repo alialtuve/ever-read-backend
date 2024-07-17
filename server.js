@@ -14,6 +14,10 @@ const authorRouter = require('./routes/author.route');
 const bookRouter = require('./routes/book.route');
 const lendRouter = require('./routes/lend.route');
 const userRouter = require('./routes/user.route');
+const rolRouter = require('./routes/rol.route');
+
+// Midlewares
+const authenticateUser = require('./middleware/authentication');
 
 // Error handlers
 
@@ -25,11 +29,12 @@ app.use(morgan('dev'));
 
 // routes
 app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/genre', genreRouter);
-app.use('/api/v1/author', authorRouter);
-app.use('/api/v1/book', bookRouter);
-app.use('/api/v1/lend', lendRouter);
-app.use('/api/v1/user', userRouter);
+app.use('/api/v1/genre', authenticateUser, genreRouter);
+app.use('/api/v1/author', authenticateUser, authorRouter);
+app.use('/api/v1/book', authenticateUser, bookRouter);
+app.use('/api/v1/lend', authenticateUser,lendRouter);
+app.use('/api/v1/user', authenticateUser, userRouter);
+app.use('/api/v1/rol', authenticateUser, rolRouter);
 
 // Server  
 const port = process.env.PORT || 8000;
