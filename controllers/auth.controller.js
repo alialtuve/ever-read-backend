@@ -1,27 +1,49 @@
 const User = require('../models/user.model');
 
 const register = async(req, res) => {
+  
+  const {email} = req.body;
+
+  const findEmail = await User.findOne({email});
+
+  if(findEmail) {
+    throw new Error('This email has been registred '); /* This must change after implementing handle errors middleware**/
+  }
+
   const user = await User.create({...req.body});
+
+  const token = await user.generateJWT();
+  
   res
   .status(201)
-  .json({user:{name:user.name, role:user.role}});
+  .json({user:{name:user.name}, token});
 }
 
-const getUsers = async(req, res) => {
-  const users = await User.find().sort('name');
-  res.status(200).json({users, total: users.length});
-}
+const login = async(req, res) => {
+  const {email, password} = req.body;
 
-const softDelUser = async(req, res) => {
-  const { 
-    params:  { id: userId}
-  } = req;
-  const user = await User.deleteById({ _id:userId}); 
-  res.status(200).send({msg: 'user was disabled'});
+  if(!email || !password){
+    throw new Error('No email or password provided');  /* This must change after implementing handle errors middleware**/
+  }
+
+  const user = await User.findOne({email});
+
+  if(!user){
+    throw new Error('User not found'); /* This must change after implementing handle errors middleware**/
+  }
+
+  const validatePassword = await user.comparePassword(password);
+
+  if(!validatePassword){
+    throw new Error('Invalid password'); /* This must change after implementing handle errors middleware**/
+  }
+
+  const token = await user.generateJWT();
+
+  res.status(200).json({user: {name:user.name}, token});
 }
 
 module.exports = {
   register,
-  getUsers,
-  softDelUser
+  login
 };
