@@ -3,6 +3,7 @@ const mongoose_delete = require('mongoose-delete');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const {JWT_LIFETIME, JWT_SECRET} = require('../config/env');
+const Rols = require('./rol.model');
 
 const userSchema = mongoose.Schema(
   {
@@ -33,12 +34,22 @@ const userSchema = mongoose.Schema(
       ref: 'Rol',
       required: false
     }
-  }, {timestamps:true, versionKey: false}
+  }, { timestamps:true, versionKey: false }
 );
 
 userSchema.pre('save', async function() {
   const saltCode =  await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, saltCode);
+});
+
+userSchema.pre('save', async function() {
+  if(this.rol === null || !this.rol) {
+    const query = Rols.where({ name: 'visitor'});
+    const getRol = await query.findOne();
+    if(getRol){
+      this.rol = getRol._id;
+    }
+  }
 });
 
 userSchema.methods.comparePassword = async function(typedPassword){
