@@ -7,7 +7,7 @@ const register = async(req, res) => {
   const findEmail = await User.findOne({email});
 
   if(findEmail) {
-    throw new Error('This email has been registred '); /* This must change after implementing handle errors middleware**/
+    res.status(400).json({msg:'This email already exist!'}); /* This must change after implementing handle errors middleware**/
   }
 
   const user = await User.create({...req.body});
