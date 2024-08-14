@@ -9,10 +9,9 @@ const checkAvalability = async(bookId) => {
       return -1;
     }
 
-    if(res.borrowed === res.stock){
+    if(res.borrowed === 0){
       return 0;
     }
-
     return res;
 }
 

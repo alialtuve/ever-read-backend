@@ -1,5 +1,7 @@
 const User = require('../models/user.model');
 const Rol = require('../models/rol.model');
+const { StatusCodes } = require('http-status-codes');
+const { UnauthorizedError } = require('../errors');
 
 const getUsers = async(req, res) => {
 
@@ -10,7 +12,7 @@ const getUsers = async(req, res) => {
                       select:'name',
                      });
 
-  res.status(200).json({users, total: users.length});
+  res.status(StatusCodes.CREATED).json({users, total: users.length});
 }
 
 const softDelUser = async(req, res) => {
@@ -18,7 +20,7 @@ const softDelUser = async(req, res) => {
     params:  { id: userId}
   } = req;
   const user = await User.deleteById({ _id:userId}); 
-  res.status(200).send({msg: 'user was disabled'});
+  res.status(StatusCodes.OK).send({msg: 'user was disabled'});
 }
 
 const updateUserPass = async(req, res) => {
@@ -28,7 +30,7 @@ const updateUserPass = async(req, res) => {
   //const validatePassword = await user.comparePassword(password);
 
   //if(!validatePassword){
-    //throw new Error('Invalid password'); /* This must change after implementing handle errors middleware**/
+    //throw new UnauthorizedError('Invalid password');
   //}
   
   //await User.updateOne({password: newPassword}).exec();
@@ -38,7 +40,7 @@ const updateUserPass = async(req, res) => {
     { password: newPassword},
     { new:true, runValidators: true }
   );
-  res.status(200).json({ user });
+  res.status(StatusCodes.OK).json({ user });
 
 }
 

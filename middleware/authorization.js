@@ -1,23 +1,24 @@
 const Permissions = require('../models/permission.model');
+const {ForbiddenError, UnauthorizedError} = require('../errors');
 
 const autho = (screen_code, permissionType) => async(req, res, next) => {
 
   const { rol } = req.user;
   
   if(!rol) {
-    return res.status(401).json({msg:'Not allowed access'})
+    throw new UnauthorizedError('Not authorized!');
   }
 
   const screenAccess =  await Permissions.findOne({rol,  screen_code}).exec();
 
   if(!screenAccess || screenAccess == null) {
-    return res.status(403).json({mdg:'No accesses provided!'})
+    throw new ForbiddenError('Not allowed access!');
   }
 
   if(!screenAccess[permissionType]) {
-    return res.status(403).json({mdg:'Forbidden access!'})
+    throw new ForbiddenError('Not allowed access!');
   }
-  
+
   next();
 }
 

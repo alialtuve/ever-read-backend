@@ -11,21 +11,21 @@ const lendSchema = new mongoose.Schema({
       ref: 'User',
       required: true
     },
-    returned: { // returned true - no returned : false
+    returned: { // returned: true - no returned : false
       type: Boolean,
       default: false
     },
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [false, 'Provide user'], // change to true
+      required: [true, 'Provide user'], 
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
     }
-  }, {timestamps: true}
+  }, {timestamps:true, versionKey:false}
 );
 
 module.exports = mongoose.model('Lend', lendSchema);

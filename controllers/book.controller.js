@@ -1,10 +1,16 @@
 const Book = require('../models/book.model');
 const Author = require('../models/author.model');
 const Genre = require('../models/genre.model');
+const { StatusCodes} = require('http-status-codes');
+const { NotFoundError, BadRequestError } = require('../errors');
 
 const createBook = async(req, res) => {
+  const {
+    user: { userId}
+  } = req;
+  req.body.createdBy = userId;
   const book = await Book.create( req.body);
-  res.status(201).json({ book });
+  res.status( StatusCodes.CREATED).json({ book });
 }
 
 const getAllBooks = async(req, res) => {
@@ -20,7 +26,7 @@ const getAllBooks = async(req, res) => {
   }
 
   const books = await Book.find(queryObj).sort('title');
-  res.status(200).json({ books, total:books.length });
+  res.status(StatusCodes.OK).json({ books, total:books.length });
 }
 
 const getBook = async(req, res) => {
@@ -38,27 +44,42 @@ const getBook = async(req, res) => {
                   model: Genre,
                   select: 'name'
                 });
-  res.status(200).json({ book })
+  if(!book){
+    throw new NotFoundError(`No book with id: ${bookId}, was found`)
+  }
+
+  res.status(StatusCodes.OK).json({ book });
 }
 
 const updateBook = async(req, res) => {
   const {
-    params: { id:bookId}
+    body: {title, author, stock},
+    params: { id:bookId},
+    user: { userId}
   } = req;
+
+  req.body.updatedBy = userId;
+
+  if(title =='' || author == '' || !stock){
+    throw new BadRequestError('Title, Author and stock can not be empty');
+  }
+
   const book = await Book.findByIdAndUpdate(
     { _id:bookId },
     req.body,
     { new:true, runValidators: true }
   );
-  res.status(200).json({ book });
+  res.status(StatusCodes.OK).json({book});
 }
 
 const softDeleteBook = async(req, res) => {
   const {
-    params: { id:bookId }
+    params: { id:bookId },
+    user: { userId }
   } = req;
-  const book = await Book.deleteById({ _id:bookId });
-  res.status(200).json({ msg:'book was disabled!' });
+
+  const book = await Book.deleteById({ _id:bookId }, userId);
+  res.status(StatusCodes.OK).json({ msg:'book was disabled!' });
 }
 
 module.exports ={

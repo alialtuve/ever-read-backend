@@ -18,6 +18,7 @@ const bookSchema = new mongoose.Schema(
     },
     borrowed: { 
       type: Number,
+      min: 0
     },
     author: {
       type: mongoose.Types.ObjectId,
@@ -32,16 +33,16 @@ const bookSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [false, 'Provide user'], // change to true
+      required: [true, 'Provide user'],
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
     }
-  }, {timestamps: true}
+  }, {timestamps: true, versionKey:false}
 );
 
-bookSchema.plugin(mongoose_delete, { deletedAt: true, overrideMethods: true});
+bookSchema.plugin(mongoose_delete, { deletedAt: true, deletedBy:true, overrideMethods: true});
 
 module.exports = mongoose.model('Book', bookSchema);

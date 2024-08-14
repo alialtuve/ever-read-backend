@@ -11,16 +11,16 @@ const genreSchema = mongoose.Schema(
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [false, 'Provide user'], //change to true
+      required: [true, 'Provide user'],
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
     }
-  }, {timestamps:true}
+  }, {timestamps:true, versionKey:false}
 );
 
-genreSchema.plugin(mongoose_delete, { deletedAt : true, overrideMethods: true });
+genreSchema.plugin(mongoose_delete, { deletedAt :true, deletedBy:true, overrideMethods: true });
 
 module.exports = mongoose.model('Genre', genreSchema);

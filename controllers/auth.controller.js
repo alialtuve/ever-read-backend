@@ -1,4 +1,6 @@
 const User = require('../models/user.model');
+const { StatusCodes } = require('http-status-codes');
+const { BadRequestError, NotFoundError } = require('../errors');
 
 const register = async(req, res) => {
   
@@ -7,7 +9,7 @@ const register = async(req, res) => {
   const findEmail = await User.findOne({email});
 
   if(findEmail) {
-    throw new Error('This email has been registred '); /* This must change after implementing handle errors middleware**/
+    throw new BadRequestError('This email already exist!');
   }
 
   const user = await User.create({...req.body});
@@ -15,7 +17,7 @@ const register = async(req, res) => {
   const token = await user.generateJWT();
   
   res
-  .status(201)
+  .status(StatusCodes.OK)
   .json({user:{name:user.name}, token});
 }
 
@@ -23,24 +25,24 @@ const login = async(req, res) => {
   const {email, password} = req.body;
 
   if(!email || !password){
-    throw new Error('No email or password provided');  /* This must change after implementing handle errors middleware**/
+    throw new Error('No email or password provided');
   }
 
   const user = await User.findOne({email});
 
   if(!user){
-    throw new Error('User not found'); /* This must change after implementing handle errors middleware**/
+    throw new NotFoundError('User not found');
   }
 
   const validatePassword = await user.comparePassword(password);
 
   if(!validatePassword){
-    throw new Error('Invalid password'); /* This must change after implementing handle errors middleware**/
+    throw new BadRequestError('Invalid password');
   }
 
   const token = await user.generateJWT();
 
-  res.status(200).json({ user:user.name, token });
+  res.status(StatusCodes.OK).json({ user:user.name, token });
 }
 
 module.exports = {

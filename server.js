@@ -1,9 +1,11 @@
-require('dotenv').config();
+require('express-async-errors');
+const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const express = require('express');
-const app = express();
 const morgan = require('morgan');
+const app = express();
+
+const { PORT } = require('./config/env');
 const { createRols, setPermission } = require('./config/initial.setup');
 
 //Db connection
@@ -21,7 +23,8 @@ const permRouter = require('./routes/permission.route');
 
 // Midlewares
 const authenticateUser = require('./middleware/authentication');
-
+const notFoundMiddleware = require('./middleware/not-found');
+const errorHandlerMiddleware = require('./middleware/error-handler');
 // Error handlers
 
 // Security and others
@@ -45,8 +48,11 @@ app.use('/api/v1/user', authenticateUser, userRouter);
 app.use('/api/v1/rol', authenticateUser, rolRouter);
 app.use('/api/v1/permis', authenticateUser, permRouter);
 
+app.use(notFoundMiddleware);
+app.use(errorHandlerMiddleware);
+
 // Server  
-const port = process.env.PORT || 8000;
+const port = PORT || 8000;
 
 const start = async() => {
   try {

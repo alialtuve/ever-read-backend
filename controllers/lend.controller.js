@@ -3,6 +3,8 @@ const Book = require('../models/book.model');
 const User = require('../models/user.model');
 const Author = require('../models/author.model');
 const { checkAvalability, checkIsLended } = require('../middleware/availability');
+const { StatusCodes } = require('http-status-codes');
+const { BadRequestError } = require('../errors');
 
 
 const createLend = async(req, res) => {
@@ -10,22 +12,22 @@ const createLend = async(req, res) => {
   let isLended;
 
   const {book,user} = req.body;
-
+  const { userId } = req.user;
+  
   isLended = await checkIsLended(book, user);
   availability = await checkAvalability(book);
-
+  
   if(isLended!=0){
-    throw new Error('This user has borrowed this book!');/** This must change after implementing handle errors middleware**/
+    throw new BadRequestError('This user has already borrowed this book!');
   }
-
+  
   if(availability == -1) {
-    throw new Error('This book is not available!');/** This must change after implementing handle errors middleware**/
+    throw new BadRequestError('This book is not available!');
   }
-
+  req.body.createdBy = userId;
   const lend = await Lend.create(req.body);
 
   if(lend) {
-    
     const returnBook = await Book.updateOne(
       {_id: book}, 
       {
@@ -34,7 +36,7 @@ const createLend = async(req, res) => {
     );
   }
 
-  res.status(201).json({ lend });
+  res.status(StatusCodes.CREATED).json({ lend });
 }
 
 const getAllLend = async(req, res) => {
@@ -55,7 +57,7 @@ const getAllLend = async(req, res) => {
                   select: { 'name':1, 'email':1 }
                 });
 
-  res.status(200).json({ lend, total: lend.length });
+  res.status(StatusCodes.OK).json({ lend, total: lend.length });
 }
 
 const getLend = async(req, res) => {
@@ -80,39 +82,40 @@ const getLend = async(req, res) => {
                   select: { 'name':1, 'email':1 }
                 });
 
-  res.status(200).json({ lend });
+  res.status(StatusCodes.OK).json({ lend });
 }
 
 const updateLend = async(req, res) => {
-
   let availability;
+
   const {
-    params: {id:lendId}
+    params: {id:lendId},
+    user: { userId }
   } = req;
 
   const lend = await Lend.findByIdAndUpdate(
     { _id:lendId },
     { $set: {
-      returned: true
-    }
-  },
-  { new:true }
+        returned: true,
+        updatedBy: userId
+      }
+    },
+    { new:true }
   );
   
   if(lend) {
-
+  
     availability = await checkAvalability(lend.book);
-    
-    if(availability == 0) {
-      throw new Error('No loan updated!');/* This must change after implementing handle errors middleware**/
-    }
 
+    if(availability === 0){
+      throw new BadRequestError('Field borrowed can not be negative!')
+    }
     const returnBook = await Book.updateOne(
       { _id: lend.book}, 
-      { $inc: { borrowed: -1} }
-      );
+      { $inc: { borrowed: -1 } }
+    );
   }
-  res.status(200).json({ lend });
+  res.status(StatusCodes.OK).json({ lend });
 }
 
 const  getBooksByUser = async(req,res) => {
@@ -147,7 +150,7 @@ const  getBooksByUser = async(req,res) => {
               select: { 'name':1, 'email':1 }
             });
 
-  res.status(200).json({ lend })
+  res.status(StatusCodes.OK).json({ lend })
 }
 
 module.exports = {
