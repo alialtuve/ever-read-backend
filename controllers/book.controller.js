@@ -74,9 +74,11 @@ const updateBook = async(req, res) => {
 
 const softDeleteBook = async(req, res) => {
   const {
-    params: { id:bookId }
+    params: { id:bookId },
+    user: { userId }
   } = req;
-  const book = await Book.deleteById({ _id:bookId });
+
+  const book = await Book.deleteById({ _id:bookId }, userId);
   res.status(StatusCodes.OK).json({ msg:'book was disabled!' });
 }
 

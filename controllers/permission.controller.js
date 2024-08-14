@@ -1,5 +1,5 @@
 const Permission = require('../models/permission.model');
-const Rol = require('../models/rol.model');
+const { StatusCodes } = require('http-status-codes');
 
 const getPermission = async(req, res) => {
 
@@ -9,7 +9,7 @@ const getPermission = async(req, res) => {
 
   const permission = await Permission.find({rol});
 
-  res.status(200).json({ permission });
+  res.status(StatusCodes.OK).json({ permission });
 }
 
 module.exports = {

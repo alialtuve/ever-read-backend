@@ -18,6 +18,7 @@ const bookSchema = new mongoose.Schema(
     },
     borrowed: { 
       type: Number,
+      min: 0
     },
     author: {
       type: mongoose.Types.ObjectId,
@@ -42,6 +43,6 @@ const bookSchema = new mongoose.Schema(
   }, {timestamps: true, versionKey:false}
 );
 
-bookSchema.plugin(mongoose_delete, { deletedAt: true, overrideMethods: true});
+bookSchema.plugin(mongoose_delete, { deletedAt: true, deletedBy:true, overrideMethods: true});
 
 module.exports = mongoose.model('Book', bookSchema);

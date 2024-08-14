@@ -15,16 +15,16 @@ const authorSchema = mongoose.Schema(
     createdBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
-      required: [false, 'Provide user'], // change to true
+      required: [true, 'Provide user'], 
     },
     updatedBy: {
       type: mongoose.Types.ObjectId,
       ref: 'User',
       required: false,
     }
-  }, {timestamps:true}
+  }, {timestamps:true, versionKey:false }
 );
 
-authorSchema.plugin(mongoose_delete, { deletedAt: true, overrideMethods: true});
+authorSchema.plugin(mongoose_delete, { deletedAt: true, deletedBy:true, overrideMethods: true});
 
 module.exports = mongoose.model('Author', authorSchema);
