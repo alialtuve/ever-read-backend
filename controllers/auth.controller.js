@@ -1,6 +1,6 @@
 const User = require('../models/user.model');
 const { StatusCodes } = require('http-status-codes');
-const { BadRequestError, NotFoundError } = require('../errors');
+const { BadRequestError, UnauthorizedError } = require('../errors');
 
 const register = async(req, res) => {
   
@@ -16,7 +16,7 @@ const register = async(req, res) => {
   
   res
   .status(StatusCodes.OK)
-  .json({user:{name:user.name}, token});
+  .json({ msg: 'user created'});
 }
 
 const login = async(req, res) => {
@@ -27,13 +27,10 @@ const login = async(req, res) => {
   }
 
   const user = await User.findOne({email});
-  if(!user){
-    throw new NotFoundError('User not found');
-  }
 
-  const validatePassword = await user.comparePassword(password);
-  if(!validatePassword){
-    throw new BadRequestError('Invalid password');
+  const areValidCredentials = user && (await user.comparePassword(password));
+  if(!areValidCredentials){
+    throw new UnauthorizedError('Invalid credentials');
   }
 
   const token = await user.generateJWT();
@@ -44,7 +41,7 @@ const login = async(req, res) => {
     secure:process.env.NODE_ENV === 'PRODUCTION'
   });
 
-  res.status(StatusCodes.OK).json({ user:user.name, token });
+  res.status(StatusCodes.OK).json({ msg: 'User logged in' });
 }
 
 const logout = async (req, res) => {
