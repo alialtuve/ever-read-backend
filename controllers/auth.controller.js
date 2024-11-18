@@ -20,7 +20,7 @@ const register = async(req, res) => {
 }
 
 const login = async(req, res) => {
-  
+
   const {email, password} = req.body;
   if(!email || !password){
     throw new BadRequestError('No email or password provided');
@@ -34,10 +34,10 @@ const login = async(req, res) => {
   }
 
   const token = await user.generateJWT();
-  const oneDay = 1000*60*60*24;
+  const cookieDuration = 1000*60*60*8;
   res.cookie('token', token, {
     httpOnly:true,
-    expires:new Date(Date.now() + oneDay),
+    expires:new Date(Date.now() + cookieDuration),
     secure:process.env.NODE_ENV === 'PRODUCTION'
   });
 
