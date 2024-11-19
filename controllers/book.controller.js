@@ -25,7 +25,11 @@ const getAllBooks = async(req, res) => {
     queryObj.title = { $regex:title};
   }
 
-  const books = await Book.find(queryObj).sort('title');
+  const books = await Book.find(queryObj)
+                           .sort('title')
+                           .populate('author', 'name')
+                           .populate('genre', 'name');
+
   res.status(StatusCodes.OK).json({ books, total:books.length });
 }
 

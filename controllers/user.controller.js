@@ -44,8 +44,15 @@ const updateUserPass = async(req, res) => {
 
 }
 
+const  getCurrentUser = async(req, res) => {
+  const userData = await User.findOne({ _id: req.user.userId });
+  const user = userData.noPasswordUser();
+  res.status(StatusCodes.OK).json({ user: user });
+}
+
 module.exports = {
   getUsers,
   softDelUser,
-  updateUserPass
+  updateUserPass,
+  getCurrentUser
 }

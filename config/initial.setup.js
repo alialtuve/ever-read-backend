@@ -1,7 +1,10 @@
 const Rols = require('../models/rol.model');
 const Permission = require('../models/permission.model');
+const User = require('../models/user.model');
 const { USER_SCR, GENRE_SCR, AUTHOR_SCR, 
-        BOOK_SCR, LEND_SCR, ROL_SCR, PERM_SRC } = require('../config/env');
+        BOOK_SCR, LEND_SCR, ROL_SCR, PERM_SRC,
+        FIRST_USER_NAME, FIRST_USER_LAST,
+        FIRST_USER_EMAIL, FIRST_USER_PASS } = require('../config/env');
 
 /* Creating Rols */
 const createRols = async() => {
@@ -54,7 +57,28 @@ const setPermission = async() => {
   }
 }
 
-/* And maybe add first admin user */
+/* CREATING FIRST USER */
+
+const firstUser = async() => {
+  try {
+    const isFirstUser = await User.countDocuments();
+    if(isFirstUser > 0) return;
+    const getAdminId = await Rols.findOne({name:'admin'});
+    
+    if(!getAdminId) return;
+
+    new User({
+      name:FIRST_USER_NAME,
+      lastName:FIRST_USER_LAST,
+      email:FIRST_USER_EMAIL,
+      password:FIRST_USER_PASS,
+      rol:getAdminId
+    }).save();
+
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 
-module.exports = {createRols, setPermission}
+module.exports = {createRols, setPermission, firstUser}

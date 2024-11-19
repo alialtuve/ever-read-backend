@@ -6,7 +6,7 @@ const morgan = require('morgan');
 const app = express();
 
 const { PORT } = require('./config/env');
-const { createRols, setPermission } = require('./config/initial.setup');
+const { createRols, setPermission, firstUser } = require('./config/initial.setup');
 
 //Db connection
 const connectDB = require('./config/connection');
@@ -36,7 +36,7 @@ app.use(morgan('dev'));
 // Inital DB values
 createRols();
 setPermission();
-
+firstUser();
 
 // routes
 app.use('/api/v1/auth', authRouter);

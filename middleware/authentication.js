@@ -1,18 +1,17 @@
+const {UnauthorizedError} = require('../errors');
 const jwt = require('jsonwebtoken');
 const {JWT_SECRET} = require('../config/env');
 
 const authenticate =  async (req, res, next) => {
-
-  const authHeader = req.headers.authorization;
   
-  if(!authHeader || !authHeader.startsWith('Bearer')){
-    throw new Error ('Invalid authentication');
-  }
+  const token = req.headers?.cookie?.split('token=')[1] || false;
   
-  const token = authHeader.split(' ')[1];
-
+  if(!token && !req.headers.cookie){
+    throw new UnauthorizedError ('Invalid authentication');
+  }  
+ 
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = jwt.verify(token, JWT_SECRET);    
     req.user = {userId: payload.user, name:payload.name, rol:payload.rol};
     next();
 
@@ -21,4 +20,4 @@ const authenticate =  async (req, res, next) => {
   }
 }
 
-module.exports = authenticate ;
+module.exports = authenticate;
