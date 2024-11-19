@@ -70,6 +70,12 @@ userSchema.methods.generateJWT = async function() {
   return token;
 }
 
+userSchema.methods.noPasswordUser = function() {
+  let userObj = this.toObject();
+  delete userObj.password;
+  return userObj;
+}
+
 userSchema.plugin(mongoose_delete, { deletedAt : true, overrideMethods: true });
 
 module.exports = mongoose.model('User', userSchema);
