@@ -1,3 +1,4 @@
+const {ObjectId} = require('mongoose').Types;
 const Book = require('../models/book.model');
 const Author = require('../models/author.model');
 const Genre = require('../models/genre.model');
@@ -14,21 +15,62 @@ const createBook = async(req, res) => {
 }
 
 const getAllBooks = async(req, res) => {
+  let books = '';
   const { writer, title } = req.query;
+
   const queryObj = {};
+ 
+  if(title) {
+     queryObj.title = { $regex:title};
+   }
+   
+  if(writer && writer !== '00'){
+      books = await Book.aggregate([
+        {
+          $lookup:{
+            from: 'authors',
+            localField:'author',
+            foreignField:'_id',
+            as:'author'
+          }
+        },
+        {
+          $lookup:{
+            from: 'genres',
+            localField:'genre',
+            foreignField:'_id',
+            as:'genre'
+          }
+        },
+        { $match:{ 'author._id': new ObjectId(writer) }},
+        {
+          $set: 
+          {
+            author : {
+              $map: { 
+                input: '$author', 
+                in: { _id:'$$this._id', name: '$$this.name'}
+              }
+            },
+            genre : {
+              $map: { 
+                input: '$genre', 
+                in: { _id:'$$this._id', name: '$$this.name'}
+              }
+            }
+          }
+        },
+        { $unwind:"$author" },
+        { $unwind: '$genre' }
+      ])
 
-  if(writer){
-    queryObj.author = writer;
+  } else {
+    
+    books = await Book.find(queryObj)
+                             .sort('title')
+                             .populate('author', 'name')
+                             .populate('genre', 'name');
   }
-
- if(title) {
-    queryObj.title = { $regex:title};
-  }
-
-  const books = await Book.find(queryObj)
-                           .sort('title')
-                           .populate('author', 'name')
-                           .populate('genre', 'name');
 
   res.status(StatusCodes.OK).json({ books, total:books.length });
 }
