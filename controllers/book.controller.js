@@ -23,6 +23,11 @@ const getAllBooks = async(req, res) => {
   if(title) {
      queryObj.title = { $regex:title};
    }
+  
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 10;
+  const skip = (page - 1 ) * limit;
+  
    
   if(writer && writer !== '00'){
       books = await Book.aggregate([
@@ -42,7 +47,7 @@ const getAllBooks = async(req, res) => {
             as:'genre'
           }
         },
-        { $match:{ 'author._id': new ObjectId(writer) }},
+        { $match:{ 'author._id': ObjectId.createFromHexString (writer) }},
         {
           $set: 
           {
@@ -69,10 +74,15 @@ const getAllBooks = async(req, res) => {
     books = await Book.find(queryObj)
                              .sort('title')
                              .populate('author', 'name')
-                             .populate('genre', 'name');
+                             .populate('genre', 'name')
+                             .skip(skip)
+                             .limit(limit);
   }
 
-  res.status(StatusCodes.OK).json({ books, total:books.length });
+  const total = await Book.countDocuments(queryObj);
+  const numOfPages = Math.ceil(total / limit);
+
+  res.status(StatusCodes.OK).json({ books, total, numOfPages, currentPage: page });
 }
 
 const getBook = async(req, res) => {
