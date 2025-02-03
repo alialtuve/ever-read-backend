@@ -2,7 +2,7 @@ const Book = require('../models/book.model');
 const Lend = require('../models/lend.model');
 
 const checkAvalability = async(bookId) => {
-
+    
     const res = await Book.findById(bookId);
 
     if(res.borrowed === res.stock){

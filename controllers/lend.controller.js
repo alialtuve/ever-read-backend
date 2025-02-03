@@ -6,14 +6,12 @@ const { checkAvalability, checkIsLended } = require('../middleware/availability'
 const { StatusCodes } = require('http-status-codes');
 const { BadRequestError } = require('../errors');
 
-
 const createLend = async(req, res) => {
   let availability;
   let isLended;
 
-  const {book,user} = req.body;
-  const { userId } = req.user;
-  
+  const {book, user} = req.body;
+    
   isLended = await checkIsLended(book, user);
   availability = await checkAvalability(book);
   
@@ -24,7 +22,9 @@ const createLend = async(req, res) => {
   if(availability == -1) {
     throw new BadRequestError('This book is not available!');
   }
-  req.body.createdBy = userId;
+  
+  req.body.createdBy = req.user.userId;
+  
   const lend = await Lend.create(req.body);
 
   if(lend) {
