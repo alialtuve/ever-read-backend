@@ -1,3 +1,4 @@
+const {ObjectId} = require('mongoose').Types;
 const Lend = require('../models/lend.model');
 const Book = require('../models/book.model');
 const User = require('../models/user.model');
@@ -86,15 +87,16 @@ const getLend = async(req, res) => {
 }
 
 const updateLend = async(req, res) => {
+  
   let availability;
-
+  
   const {
     params: {id:lendId},
     user: { userId }
   } = req;
-
+  
   const lend = await Lend.findByIdAndUpdate(
-    { _id:lendId },
+    { _id: ObjectId.createFromHexString(lendId) },
     { $set: {
         returned: true,
         updatedBy: userId
@@ -104,14 +106,14 @@ const updateLend = async(req, res) => {
   );
   
   if(lend) {
-  
+    console.log('lend', lend);
     availability = await checkAvalability(lend.book);
 
     if(availability === 0){
       throw new BadRequestError('Field borrowed can not be negative!')
     }
     const returnBook = await Book.updateOne(
-      { _id: lend.book}, 
+      { _id: lend.book},  
       { $inc: { borrowed: -1 } }
     );
   }
